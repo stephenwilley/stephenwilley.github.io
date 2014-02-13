@@ -5,14 +5,15 @@ ESSTEC.WebGLTest = new function() {
 		controls,
 		scene,
 		renderer,
-		$container = $('#container'),
-		width      = $container.width(),
-		height     = $container.height(),
+		$container  = $('#container'),
+		width       = $container.width(),
+		height      = $container.height(),
 		callbacks,
+		incrementer = 0.0,
 
 	// Other Internal vars
-		attributesBasic01,
-		uniformsBasic01,
+		attributesUndulating,
+		uniformsUndulating,
 
 	// Core objects
 		sphere,
@@ -33,7 +34,8 @@ ESSTEC.WebGLTest = new function() {
 		createRenderer();
 		createObjects();
 		    
-		// Start rendering
+		// Start rendering after a first resize
+		callbacks.windowResize();
 		update();
 	}
 
@@ -53,7 +55,7 @@ ESSTEC.WebGLTest = new function() {
 
 		camera = new THREE.PerspectiveCamera(45, width / height, NEAR, FAR);
 		controls = new THREE.OrbitControls(camera);
-		controls.addEventListener('change', render);
+		//controls.addEventListener('change', update);
 
 		scene = new THREE.Scene();
 
@@ -69,14 +71,49 @@ ESSTEC.WebGLTest = new function() {
 	 * Create the objects for the scene
 	 */
 	function createObjects() {
-		basic01Material = new THREE.ShaderMaterial({
-			vertexShader: ESSTEC.Shaders.basic01.vertex,
-			fragmentShader: ESSTEC.Shaders.basic01.fragment
+		createUndulatingSphere();
+	}
+
+	/**
+	 * Create undulating sphere
+	 */
+	function createUndulatingSphere() {
+		// Set up the uniforms for the shader
+		uniformsUndulating = {
+			amplitude: {
+				type: 'f', // a float
+				value: 0
+			}
+		};
+
+		// Set up the attributes for the shader
+		attributesUndulating = {
+			displacement: {
+				type: 'f', // a float
+				value: [] // an empty array
+			}
+		};
+
+		// Create the material
+		undulatingMaterial = new THREE.ShaderMaterial({
+			uniforms: uniformsUndulating,
+			attributes: attributesUndulating,
+			vertexShader: ESSTEC.Shaders.undulating.vertex,
+			fragmentShader: ESSTEC.Shaders.undulating.fragment
 		});
 
+		// Create the geometry
 		sphereGeometry = new THREE.Mesh( new THREE.SphereGeometry(50, 16, 16),
-			basic01Material);
+			undulatingMaterial);
 
+		// Set the attributes
+		var verts = sphereGeometry.geometry.vertices;
+		var values = attributesUndulating.displacement.value;
+		for (var v = 0; v < verts.length; v++) {
+			values.push(Math.random() * 30);
+		}
+
+		// Add it to the scene
 		scene.add(sphereGeometry);
 	}
 
@@ -84,6 +121,9 @@ ESSTEC.WebGLTest = new function() {
 	 * Updates stuff
 	 */
 	function update() {
+		uniformsUndulating.amplitude.value = Math.sin(incrementer) * 0.1;
+		incrementer += 0.1;
+
 		requestAnimationFrame(render);
 	}
 
