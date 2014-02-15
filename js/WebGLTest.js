@@ -103,7 +103,7 @@ ESSTEC.WebGLTest = new function() {
 		});
 
 		// Create the geometry
-		sphereGeometry = new THREE.Mesh( new THREE.SphereGeometry(50, 16, 16),
+		sphereGeometry = new THREE.Mesh( new THREE.SphereGeometry(50, 32, 32),
 			undulatingMaterial);
 
 		// Set the attributes
