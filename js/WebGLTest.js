@@ -121,7 +121,7 @@ ESSTEC.WebGLTest = new function() {
 	 * Updates stuff
 	 */
 	function update() {
-		uniformsUndulating.amplitude.value = Math.sin(incrementer) * 0.1;
+		uniformsUndulating.amplitude.value = Math.sin(incrementer) * 0.5;
 		incrementer += 0.1;
 
 		requestAnimationFrame(render);
